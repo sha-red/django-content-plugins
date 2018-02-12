@@ -9,9 +9,7 @@ from shared.utils.fields import AutoSlugField
 from shared.utils.functional import firstof
 from shared.utils.text import slimdown
 
-
-USE_TRANSLATABLE_FIELDS = getattr(settings, 'CONTENT_USE_TRANSLATABLE_FIELDS', True)
-# TODO Implement translatable AutoSlugField: USE_TRANSLATABLE_SLUG_FIELDS = getattr(settings, 'CONTENT_USE_TRANSLATABLE_SLUG_FIELDS', True)
+from . import USE_TRANSLATABLE_FIELDS
 
 
 if USE_TRANSLATABLE_FIELDS:

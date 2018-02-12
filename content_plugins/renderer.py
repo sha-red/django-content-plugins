@@ -8,10 +8,11 @@ class MultilingualRegions(Regions):
         return '%s-%s' % (get_language(), super().cache_key(region))
 
 
-class PluginRenderer(TemplatePluginRenderer):
-    # Used as decorator
+class ContentPluginRenderer(TemplatePluginRenderer):
     def register(self):
         """
+        Used as decorator
+
         Usage:
             @renderer.register()
             class TextPlugin(ModelPlugin):

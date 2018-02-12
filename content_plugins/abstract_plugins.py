@@ -10,13 +10,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from feincms3.cleanse import CleansedRichTextField
 from shared.utils.fields import AutoSlugField
-from shared.multilingual.utils.fields import TranslatableCharField, TranslatableTextField
 
 from .admin import ContentInlineBase, RichTextInlineBase
-from .fields import TranslatableCleansedRichTextField
 
-# FIXME Implement USE_TRANSLATABLE_FIELDS
-from .mixins import USE_TRANSLATABLE_FIELDS
+from . import USE_TRANSLATABLE_FIELDS
+
+if USE_TRANSLATABLE_FIELDS:
+    from shared.multilingual.utils.fields import TranslatableCharField
+    from .fields import TranslatableCleansedRichTextField
 
 
 """
@@ -31,8 +32,8 @@ TODO Class hierarchy should be
 class BasePlugin(models.Model):
     class Meta:
         abstract = True
-        verbose_name = _("Element")
-        verbose_name_plural = _("Elements")
+        verbose_name = _("plugin")
+        verbose_name_plural = _("plugins")
 
     def __str__(self):
         return "{} ({})".format(self._meta.verbose_name, self.pk)
@@ -57,14 +58,16 @@ class BasePlugin(models.Model):
         or an instance with a "render" method (i.e. a Template instance).
 
         Default implementation is to return the result of self.get_template_names().
+
+        See rendering logic in feincms3.TemplateRendererPlugin.
         """
         return self.get_template_names()
 
     def get_context_data(self, request_context, **kwargs):
         context = kwargs.get('context', {})
-        context['parent'] = self.parent
-        context['request'] = request_context['request']
         context['content'] = self
+        context['parent'] = self.parent
+        context['request'] = getattr(request_context, 'request', None)
         return context
 
     # For rendering the template's render() method is used
@@ -82,19 +85,19 @@ class StringRendererPlugin(BasePlugin):
         raise NotImplementedError
 
 
-class StyleField(models.CharField):
-    # Allow overriding of STYLE_CHOICES constant in subclasses
-
-    def contribute_to_class(self, cls, name, **kwargs):
-        if hasattr(cls, 'STYLE_CHOICES'):
-            self.choices = cls.STYLE_CHOICES
-        super().contribute_to_class(cls, name, **kwargs)
-
-
 class StyleMixin(models.Model):
+    class StyleField(models.CharField):
+        # Allow overriding of STYLE_CHOICES in subclasses
+
+        def contribute_to_class(self, cls, name, **kwargs):
+            if hasattr(cls, 'STYLE_CHOICES'):
+                self.choices = cls.STYLE_CHOICES
+            super().contribute_to_class(cls, name, **kwargs)
+
     STYLE_CHOICES = (
         ('default', _("default")),
     )
+
     style = StyleField(_("style"), max_length=50, null=True, blank=True)
 
     class Meta:
@@ -103,42 +106,56 @@ class StyleMixin(models.Model):
     def get_style_slug(self):
         return getattr(self, 'style', None) or 'default'
 
+    def get_template_names(self):
+        # Should only be called by classes using filesystem templates
+        template_names = super().get_template_names() or []
+        template_names.extend([
+            "{path_prefix}style/_{style}.html".format(
+                path_prefix=self.get_path_prefix(),
+                style=self.get_style_slug()),
+        ])
+        return template_names
+
 
 class FilesystemTemplateRendererPlugin(BasePlugin):
-    # TODO Join FilesystemTemplateRendererPlugin code with BaseObjectElement code
-
     template_name = None
-    path_prefix = None  # Potential values: "richtext", "image"
+    path_prefix = 'plugins/'  # TODO Rename to 'template_name_prefix'
 
     class Meta:
         abstract = True
 
     def get_path_prefix(self):
-        if self.path_prefix:
-            return "{}{}".format(self.path_prefix, os.path.sep)
-        else:
-            return ""
+        return self.path_prefix
+
+    def prefixed_path(self, path):
+        return "{}{}".format(self.get_path_prefix(), path)
 
     def get_template_names(self):
-        # TODO Style related logic should be part of the StyleMixin: maybe get_template_names should call super()
-        if hasattr(self, 'style'):
+        # Per default look first for absolute template_name path and
+        # template_name path prefixed with path_prefix.
+        if getattr(self, 'template_name', False):
             template_names = [
-                "curatorialcontent/elements/{path_prefix}style/_{style}.html".format(
-                    path_prefix=self.get_path_prefix(), style=self.get_style_slug()),
+                self.template_name,
+                self.prefixed_path(self.template_name)
             ]
         else:
             template_names = []
 
+        template_names.extend(super().get_template_names() or [])
+
         return template_names + [
-            "curatorialcontent/elements/{path_prefix}_default.html".format(
+            "{path_prefix}_default.html".format(
                 path_prefix=self.get_path_prefix())
-        ] + ([self.template_name] if getattr(self, 'template_name', None) else [])
+        ]
 
 
 class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
-    richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
+    if USE_TRANSLATABLE_FIELDS:
+        richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
+    else:
+        richtext = CleansedRichTextField(_("text"), blank=True)
 
-    path_prefix = 'richtext'
+    path_prefix = FilesystemTemplateRendererPlugin.path_prefix + 'richtext/'
 
     class Meta:
         abstract = True
@@ -151,29 +168,29 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
 
 class SectionBase(StyleMixin, BasePlugin):
-    subheading = TranslatableCharField(_("subheading"), max_length=500)
+    if USE_TRANSLATABLE_FIELDS:
+        subheading = TranslatableCharField(_("subheading"), max_length=500)
+    else:
+        subheading = models.CharField(_("subheading"), max_length=500)
     slug = AutoSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
 
     class Meta:
         abstract = True
-        verbose_name = _("Abschnittswechsel")
-        verbose_name_plural = _("Abschnittswechsel")
+        verbose_name = _("section")
+        verbose_name_plural = _("section")
 
     def get_template(self):
         return Template("""
-            </div>
         </section>
 
         <section id="{{ slug }}">
-            <h2>{{ heading }}</h2>
-
-            <div class="text">
+            <h2>{{ subheading }}</h2>
         """)
 
     def get_context_data(self, request_context, **kwargs):
         context = super().get_context_data(request_context, **kwargs)
         context['slug'] = self.slug
-        context['heading'] = self.heading
+        context['subheading'] = self.subheading
         return context
 
 
@@ -224,7 +241,10 @@ class DownloadBase(StyleMixin, BasePlugin):
 class FootnoteBase(BasePlugin):
     # TODO Validators: index might only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
-    richtext = TranslatableCleansedRichTextField(_("footnote text"))
+    if USE_TRANSLATABLE_FIELDS:
+        richtext = TranslatableCleansedRichTextField(_("footnote text"))
+    else:
+        richtext = CleansedRichTextField(_("footnote text"))
 
     html_tag = '<li>'
 
@@ -233,13 +253,12 @@ class FootnoteBase(BasePlugin):
         verbose_name = _("footnote")
         verbose_name_plural = _("footnote")
 
+    # TODO Convert to Template
     def render(self, html_tag=None):
         template = """
         {opening_tag}
-            <div class="text">
-                <a id="fn{number}" class="footnote-index" href="#back{number}">{number}</a>
-                {text}
-            </div>
+            <a id="fn{number}" class="footnote-index" href="#back{number}">{number}</a>
+            <div class="text">{text}</div>
         {closing_tag}
         """
         context = {
