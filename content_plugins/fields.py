@@ -1,5 +1,3 @@
-# Erik Stein <code@classlibrary.net>, 2017
-
 from feincms3.cleanse import CleansedRichTextField
 from shared.multilingual.utils.fields import TranslatableFieldMixin
 

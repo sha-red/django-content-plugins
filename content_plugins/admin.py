@@ -1,4 +1,3 @@
-# Erik Stein <code@classlibrary.net>, 2017
 """
 Abstract base classes and mixins.
 """

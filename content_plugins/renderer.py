@@ -1,12 +1,9 @@
-# Erik Stein <code@classlibrary.net>, 2017
-
-from django.db.models import Model
 from django.utils.translation import get_language
 
 from feincms3.renderer import Regions, TemplatePluginRenderer
 
-class MultilingualRegions(Regions):
 
+class MultilingualRegions(Regions):
     def cache_key(self, region):
         return '%s-%s' % (get_language(), super().cache_key(region))
 

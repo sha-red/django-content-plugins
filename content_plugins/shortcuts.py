@@ -5,7 +5,6 @@ from django.utils.html import strip_tags
 
 from content_editor.contents import contents_for_item
 from shared.utils.text import html_entities_to_unicode
-from shared.utils.translation import get_language_order
 
 
 def render_page_as_text(page, renderer, template, language):

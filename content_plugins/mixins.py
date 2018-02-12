@@ -1,5 +1,3 @@
-# Erik Stein <code@classlibrary.net>, 2017
-
 from functools import reduce, partial
 from django.conf import settings
 from django.db import models
