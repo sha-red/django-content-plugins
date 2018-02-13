@@ -2,6 +2,7 @@
 Example instantiation of the abstract plugin base classes
 """
 
+"""
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -369,3 +370,4 @@ class ItembundleSlideshowContentPlugin(BaseSlideshowContentPlugin):
         inline.raw_id_fields += ['itembundle']
         return inline
 
+"""
