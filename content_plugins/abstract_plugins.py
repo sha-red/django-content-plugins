@@ -15,6 +15,7 @@ from .admin import ContentInlineBase, RichTextInlineBase
 
 from . import USE_TRANSLATABLE_FIELDS
 
+
 if USE_TRANSLATABLE_FIELDS:
     from shared.multilingual.utils.fields import TranslatableCharField
     from .fields import TranslatableCleansedRichTextField
