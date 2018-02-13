@@ -25,16 +25,12 @@ class RichTextarea(forms.Textarea):
 
 
 class RichTextInlineBase(ContentInlineBase):
-    # Subclasses: Add your model, like model = models.RichTextArticlePlugin
-
     formfield_overrides = {
-        'richtext_en': {'widget': RichTextarea},
+        'richtext': {'widget': RichTextarea},
     }
-
-    regions = []
 
     class Media:
         js = (
             # '//cdn.ckeditor.com/4.5.6/standard/ckeditor.js',
-            'js/plugin_ckeditor.js',
+            'feincms3/plugin_ckeditor.js',
         )
