@@ -1,8 +1,4 @@
-# TODO Always use Django templates for rendering, replace .format() class
-
-import os
 import re
-from django.conf import settings
 from django.db import models
 from django.template import Template
 from django.utils.html import format_html, mark_safe
@@ -275,6 +271,7 @@ class FootnoteBase(BasePlugin):
         return mark_safe(template.format(**context))
 
 
+# FIXME Currently doesn't do anything
 class RichTextFootnoteMixin:
     MATCH_FOOTNOTES = re.compile("<sup>(\w+)</sup>")
 

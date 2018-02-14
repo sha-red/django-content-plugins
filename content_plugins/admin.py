@@ -13,6 +13,8 @@ class ContentInlineBase(ContentEditorInline):
     """
 
 
+# TODO Use feincms3.plugins.richtext.RichText/RichTextInline instead
+
 class RichTextarea(forms.Textarea):
     def __init__(self, attrs=None):
         # Provide class so that the code in plugin_ckeditor.js knows
