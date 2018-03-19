@@ -1,12 +1,13 @@
 import re
 from django.db import models
 from django.template import Template
-from django.utils.html import format_html, mark_safe
+from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from feincms3.cleanse import CleansedRichTextField
 from shared.utils.fields import AutoSlugField
 
+# TODO Rename ContentInlineBase to PluginInlineBase
 from .admin import ContentInlineBase, RichTextInlineBase
 
 from .plugins.mixins import StyleMixin
@@ -134,7 +135,8 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
     @classmethod
     def admin_inline(cls, base_class=None):
-        return super().admin_inline(base_class=RichTextInlineBase)
+        return super().admin_inline(base_class=base_class or
+                                    RichTextInlineBase)
 
 
 class SectionBase(StyleMixin, BasePlugin):
@@ -164,6 +166,7 @@ class SectionBase(StyleMixin, BasePlugin):
         return context
 
 
+# ImageBase can't live here because image managment is different from project to project
 # class ImageBase(StyleMixin, BasePlugin):
 #     image = models.ForeignKey(Image, on_delete=models.PROTECT)
 #     alt_caption = TranslatableCharField(_("caption"), max_length=500, null=True, blank=True, help_text=_("Optional, used instead of the caption of the image object."))#
@@ -190,6 +193,7 @@ class SectionBase(StyleMixin, BasePlugin):
 #         ))
 
 
+# TODO See comments on ImageBase; remove DownloadBase
 class DownloadBase(StyleMixin, BasePlugin):
     file = models.FileField(upload_to='downloads/%Y/%m/')
 

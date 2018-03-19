@@ -3,7 +3,9 @@ Abstract base classes and mixins.
 """
 
 from django import forms
+from django.conf import settings
 
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from content_editor.admin import ContentEditorInline
 
 
@@ -15,7 +17,13 @@ class ContentInlineBase(ContentEditorInline):
 
 # TODO Use feincms3.plugins.richtext.RichText/RichTextInline instead
 
-class RichTextarea(forms.Textarea):
+if getattr(settings, 'CKEDITOR_UPLOADS', False):
+    base_classes = [CKEditorUploadingWidget]
+else:
+    base_classes = [forms.Textarea]
+
+
+class RichTextarea(*base_classes):
     def __init__(self, attrs=None):
         # Provide class so that the code in plugin_ckeditor.js knows
         # which text areas should be enhanced with a rich text
