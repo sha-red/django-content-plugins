@@ -25,14 +25,30 @@ class StyleMixin(models.Model):
     def get_style_slug(self):
         return getattr(self, 'style', None) or 'default'
 
+    # Compatibiliy with super classes not having a prefixed_path method
+    def prefixed_path(self, path):
+        if hasattr(super(), 'prefixed_path'):
+            return super().prefixed_path(path)
+        else:
+            return path
+
     def get_template_names(self):
-        # Should only be called by classes using filesystem templates
-        template_names = super().get_template_names() or []
-        template_names.extend([
-            "{path_prefix}style/_{style}.html".format(
-                path_prefix=self.get_path_prefix(),
-                style=self.get_style_slug()),
-        ])
-        return template_names
+        if hasattr(super(), 'get_template_names'):
+            template_names = super().get_template_names()
+        else:
+            template_names = []
 
+        return template_names + [
+            self.prefixed_path(
+                "style/_{style}.html".format(
+                    style=self.get_style_slug()),
+            )
+        ]
 
+    def get_context_data(self, **kwargs):
+        if hasattr(super(), 'get_context_data'):
+            context = super().get_context_data(**kwargs)
+        else:
+            context = {}
+        context['style'] = self.get_style_slug()
+        return context

@@ -44,7 +44,7 @@ class BlockquoteContentPlugin(plugins.RichTextFootnoteMixin, plugins.RichTextBas
         ('introquote', _("Introductory Quote")),
     )
 
-    path_prefix = 'quote'
+    template_name_prefix = 'quote'
 
     regions = ['main', 'intro']
 
@@ -275,7 +275,7 @@ class MediaDocumentElement(BaseObjectElement):
 class SubsectionsElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin, ContentPluginBase):
     regions = ['main', 'aside']
 
-    path_prefix = 'subsections_nav'
+    template_name_prefix = 'subsections_nav'
 
     class Meta:
         verbose_name = _("subsections navigation element")
@@ -286,7 +286,7 @@ class SubsectionsElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererP
 class TeamElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin, ContentPluginBase):
     regions = ['main', 'aside']
 
-    path_prefix = 'team'
+    template_name_prefix = 'team'
 
     class Meta:
         verbose_name = _("team navigation element")
@@ -297,7 +297,7 @@ class TeamElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin, 
 class ActorsElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin, ContentPluginBase):
     regions = ['main', 'aside']
 
-    path_prefix = 'actors'
+    template_name_prefix = 'actors'
 
     class Meta:
         verbose_name = _("actors navigation element")
@@ -308,7 +308,7 @@ class ActorsElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin
 class ArticlesElement(plugins.StyleMixin, plugins.FilesystemTemplateRendererPlugin, ContentPluginBase):
     regions = ['main', 'aside']
 
-    path_prefix = 'articles_nav'
+    template_name_prefix = 'articles_nav'
 
     class Meta:
         verbose_name = _("articles navigation element")
@@ -327,7 +327,7 @@ class BaseSlideshowContentPlugin(plugins.StyleMixin, plugins.FilesystemTemplateR
 
     caption = plugins.TranslatableCleansedRichTextField(_("caption"), blank=True)
 
-    path_prefix = 'slide'
+    template_name_prefix = 'slide'
 
     regions = ['slides']
 
@@ -341,7 +341,7 @@ class BaseSlideshowContentPlugin(plugins.StyleMixin, plugins.FilesystemTemplateR
 
 @renderer.register()
 class TextSlideshowContentPlugin(BaseSlideshowContentPlugin):
-    path_prefix = 'slide/text/'
+    template_name_prefix = 'slide/text/'
 
     regions = ['slides']
 
@@ -354,7 +354,7 @@ class TextSlideshowContentPlugin(BaseSlideshowContentPlugin):
 class ItembundleSlideshowContentPlugin(BaseSlideshowContentPlugin):
     itembundle = models.ForeignKey(ItemBundle, verbose_name=_("ItemBundle"))
 
-    path_prefix = 'slide/itembundle/'
+    template_name_prefix = 'slide/itembundle/'
 
     regions = ['slides']
 

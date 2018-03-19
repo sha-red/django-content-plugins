@@ -85,20 +85,24 @@ class StringRendererPlugin(BasePlugin):
 
 class FilesystemTemplateRendererPlugin(BasePlugin):
     template_name = None
-    path_prefix = 'plugins/'  # TODO Rename to 'template_name_prefix'
+    template_name_prefix = 'plugins/'
 
     class Meta:
         abstract = True
 
-    def get_path_prefix(self):
-        return self.path_prefix
+    def get_template_name_prefix(self):
+        return getattr(self, 'template_name_prefix', '')
 
     def prefixed_path(self, path):
-        return "{}{}".format(self.get_path_prefix(), path)
+        return "{}{}".format(self.get_template_name_prefix(), path)
 
     def get_template_names(self):
-        # Per default look first for absolute template_name path and
-        # template_name path prefixed with path_prefix.
+        """
+        Look first for template_name,
+        second for prefixed template_name,
+        then super's template names,
+        finally prefixed _default.html.
+        """
         if getattr(self, 'template_name', False):
             template_names = [
                 self.template_name,
@@ -110,8 +114,7 @@ class FilesystemTemplateRendererPlugin(BasePlugin):
         template_names.extend(super().get_template_names() or [])
 
         return template_names + [
-            "{path_prefix}_default.html".format(
-                path_prefix=self.get_path_prefix())
+            self.prefixed_path("_default.html")
         ]
 
 
@@ -121,7 +124,8 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
     else:
         richtext = CleansedRichTextField(_("text"), blank=True)
 
-    path_prefix = FilesystemTemplateRendererPlugin.path_prefix + 'richtext/'
+    template_name_prefix = \
+        FilesystemTemplateRendererPlugin.template_name_prefix + 'richtext/'
 
     class Meta:
         abstract = True
