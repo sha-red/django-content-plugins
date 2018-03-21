@@ -29,6 +29,8 @@ TODO Class hierarchy should be
 
 
 class BasePlugin(models.Model):
+    admin_inline_baseclass = ContentInlineBase
+
     class Meta:
         abstract = True
         verbose_name = _("plugin")
@@ -38,8 +40,9 @@ class BasePlugin(models.Model):
         return "{} ({})".format(self._meta.verbose_name, self.pk)
 
     @classmethod
-    def admin_inline(cls, base_class=ContentInlineBase):
-        class Inline(base_class):
+    def admin_inline(cls):
+        # TODO Cache inline
+        class Inline(cls.admin_inline_baseclass):
             model = cls
             regions = cls.regions
         return Inline
@@ -128,15 +131,12 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
     template_name_prefix = \
         FilesystemTemplateRendererPlugin.template_name_prefix + 'richtext/'
 
+    admin_inline_baseclass = RichTextInlineBase
+
     class Meta:
         abstract = True
         verbose_name = _("text")
         verbose_name_plural = _("texts")
-
-    @classmethod
-    def admin_inline(cls, base_class=None):
-        return super().admin_inline(base_class=base_class or
-                                    RichTextInlineBase)
 
 
 class SectionBase(StyleMixin, BasePlugin):
