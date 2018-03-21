@@ -1,5 +1,7 @@
+from django.db.models import Model
 from django.utils.translation import get_language
 
+from content_editor import renderer as content_editor
 from feincms3.renderer import Regions, TemplatePluginRenderer
 
 
@@ -26,3 +28,21 @@ class ContentPluginRenderer(TemplatePluginRenderer):
 
     def regions(self, item, inherit_from=None, regions=MultilingualRegions):
         return super().regions(item, inherit_from=inherit_from, regions=regions)
+
+
+# Preliminary class
+class PluginRenderer(content_editor.PluginRenderer):
+    def register(self, plugin, renderer=None):
+        if not renderer:
+            # Might raise an AttributeError
+            renderer = getattr(plugin, 'render')
+        self._renderers[plugin] = renderer
+
+    def get_registered_plugins(self, exclude=[]):
+        registered_plugins = list(self._renderers.keys())
+        registered_plugins.remove(Model)
+        return [p for p in registered_plugins if p not in exclude]
+
+    def get_admin_inlines(self, exclude=[]):
+        plugins = self.get_registered_plugins(exclude)
+        return [p.admin_inline() for p in plugins]
