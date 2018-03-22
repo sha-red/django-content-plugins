@@ -65,11 +65,12 @@ class BasePlugin(models.Model):
         """
         return self.get_template_names()
 
-    def get_context_data(self, request_context, **kwargs):
+    def get_context_data(self, request_context=None, **kwargs):
         context = kwargs.get('context', {})
         context['content'] = self
         context['parent'] = self.parent
-        context['request'] = getattr(request_context, 'request', None)
+        if request_context:
+            context['request'] = getattr(request_context, 'request', None)
         return context
 
     # For rendering the template's render() method is used
