@@ -52,7 +52,7 @@ class BasePlugin(models.Model):
         renderer.register_template_renderer(cls, cls.get_template, cls.get_context_data)
 
     def get_template_names(self):
-        return getattr(self, 'template_name', None)
+        return [getattr(self, 'template_name', None)]
 
     def get_template(self):
         """
