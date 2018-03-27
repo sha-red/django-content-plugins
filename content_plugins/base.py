@@ -40,9 +40,9 @@ class BasePlugin(models.Model):
         return "{} ({})".format(self._meta.verbose_name, self.pk)
 
     @classmethod
-    def admin_inline(cls):
+    def admin_inline(cls, base_class=None):
         # TODO Cache inline
-        class Inline(cls.admin_inline_baseclass):
+        class Inline(base_class or cls.admin_inline_baseclass):
             model = cls
             regions = cls.regions
         return Inline
