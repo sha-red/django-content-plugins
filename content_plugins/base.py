@@ -69,12 +69,13 @@ class BasePlugin(models.Model):
         """
         return self.get_template_names()
 
-    def get_context_data(self, request_context=None, **kwargs):
-        context = kwargs.get('context', {})
+    def get_context_data(self, **kwargs):
+        # context = kwargs.get('context', {})
+        context = {}
         context['content'] = self
         context['parent'] = self.parent
-        if request_context:
-            context['request'] = getattr(request_context, 'request', None)
+        if 'request_context' in kwargs:
+            context['request'] = getattr(kwargs['request_context'], 'request', None)
         return context
 
     # For rendering the template's render() method is used
@@ -120,6 +121,7 @@ class FilesystemTemplateRendererPlugin(BasePlugin):
         else:
             template_names = []
 
+        # TODO Don't call super here, this *is* the file system template plugin
         template_names.extend(super().get_template_names() or [])
 
         return template_names + [
@@ -164,8 +166,8 @@ class SectionBase(StyleMixin, BasePlugin):
             <h2>{{ subheading }}</h2>
         """)
 
-    def get_context_data(self, request_context, **kwargs):
-        context = super().get_context_data(request_context, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context
