@@ -49,7 +49,7 @@ class BasePlugin(models.Model):
 
     @classmethod
     def register_with_renderer(cls, renderer):
-        renderer.register_template_renderer(cls, cls.get_template, cls.get_context_data)
+        renderer.register_template_renderer(cls, cls.get_template, cls.get_plugin_context)
 
     def get_template_names(self):
         t = getattr(self, 'template_name', None)
@@ -69,13 +69,16 @@ class BasePlugin(models.Model):
         """
         return self.get_template_names()
 
-    def get_context_data(self, context=None, **kwargs):
-        context = context or {}
-        context['content'] = self
-        context['parent'] = self.parent
+    def get_plugin_context(self, context=None, **kwargs):
+        """
+        Returns a dict.
+        """
+        plugin_context = {}
+        plugin_context['content'] = self
+        plugin_context['parent'] = self.parent
         if 'request_context' in kwargs:
-            context['request'] = getattr(kwargs['request_context'], 'request', None)
-        return context
+            plugin_context['request'] = getattr(kwargs['request_context'], 'request', None)
+        return plugin_context
 
     # For rendering the template's render() method is used
 
@@ -165,8 +168,8 @@ class SectionBase(StyleMixin, BasePlugin):
             <h2>{{ subheading }}</h2>
         """)
 
-    def get_context_data(self, context=None, **kwargs):
-        context = super().get_context_data(context=context, **kwargs)
+    def get_plugin_context(self, context=None, **kwargs):
+        context = super().get_plugin_context(context=None, **kwargs)
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context

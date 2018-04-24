@@ -45,10 +45,10 @@ class StyleMixin(models.Model):
             )
         ]
 
-    def get_context_data(self, context=None, **kwargs):
-        if hasattr(super(), 'get_context_data'):
-            context = super().get_context_data(context=context, **kwargs)
+    def get_plugin_context(self, context=None, **kwargs):
+        if hasattr(super(), 'get_plugin_context'):
+            context = super().get_plugin_context(**kwargs)
         else:
-            context = context or {}
+            context = {}
         context['style'] = self.get_style_slug()
         return context
