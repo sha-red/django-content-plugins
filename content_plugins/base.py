@@ -69,9 +69,8 @@ class BasePlugin(models.Model):
         """
         return self.get_template_names()
 
-    def get_context_data(self, **kwargs):
-        # context = kwargs.get('context', {})
-        context = {}
+    def get_context_data(self, context=None, **kwargs):
+        context = context or {}
         context['content'] = self
         context['parent'] = self.parent
         if 'request_context' in kwargs:
@@ -166,8 +165,8 @@ class SectionBase(StyleMixin, BasePlugin):
             <h2>{{ subheading }}</h2>
         """)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, context=None, **kwargs):
+        context = super().get_context_data(context=context, **kwargs)
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context

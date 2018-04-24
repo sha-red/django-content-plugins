@@ -30,7 +30,7 @@ class ContentPluginRenderer(TemplatePluginRenderer):
         return super().regions(item, inherit_from=inherit_from, regions=regions)
 
 
-# Preliminary class
+# Experimental implementation
 class PluginRenderer(content_editor.PluginRenderer):
     def register(self, plugin, renderer=None):
         if not renderer:
