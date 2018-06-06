@@ -1,8 +1,14 @@
 from django.conf import settings
 
 __version__ = '0.2.0'
-VERSION = tuple(int(d) for d in __version__.split('.'))
 
+try:
+    from ._version import __version__
+except ImportError:
+    pass
+
+VERSION = __version__.split('+')
+VERSION = tuple(list(map(int, VERSION[0].split('.'))) + VERSION[1:])
 
 USE_TRANSLATABLE_FIELDS = (
     getattr(settings, 'CONTENT_PLUGINS_USE_TRANSLATABLE_FIELDS', False) or

@@ -1,14 +1,30 @@
 #!/usr/bin/env python
 
 from io import open
-import os
 from setuptools import setup, find_packages
+import os
+import re
+import subprocess
 
 
 def get_version(prefix):
-    import re
-    with open(os.path.join(prefix, '__init__.py')) as fd:
-        metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", fd.read()))
+    if os.path.exists('.git'):
+        parts = subprocess.check_output(['git', 'describe', '--tags']).decode().strip().split('-')
+        version = '{}.{}+{}'.format(*parts)
+        version_py = "__version__ = '{}'".format(version)
+        _version = os.path.join(prefix, '_version.py')
+        if not os.path.exists(_version) or open(_version).read().strip() != version_py:
+            with open(_version, 'w') as fd:
+                fd.write(version_py)
+        return version
+    else:
+        for f in ('_version.py', '__init__.py'):
+            f = os.path.join(prefix, f)
+            if os.path.exists(f):
+                with open(f) as fd:
+                    metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", fd.read()))
+                if 'version' in metadata:
+                    break
     return metadata['version']
 
 
