@@ -1,8 +1,7 @@
 from django.conf import settings
 
-
-VERSION = (0, 2, 0)
-__version__ = '.'.join(map(str, VERSION))
+__version__ = '0.2.0'
+VERSION = tuple(int(d) for d in __version__.split('.'))
 
 
 USE_TRANSLATABLE_FIELDS = (
