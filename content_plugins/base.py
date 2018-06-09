@@ -150,9 +150,9 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
 class SectionBase(StyleMixin, BasePlugin):
     if USE_TRANSLATABLE_FIELDS:
-        subheading = TranslatableCharField(_("subheading"), max_length=500)
+        subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     else:
-        subheading = models.CharField(_("subheading"), max_length=500)
+        subheading = models.CharField(_("subheading"), null=True, blank=True, max_length=500)
     slug = AutoSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
 
     class Meta:
@@ -225,9 +225,9 @@ class FootnoteBase(BasePlugin):
     # TODO Validators: index might only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
     if USE_TRANSLATABLE_FIELDS:
-        richtext = TranslatableCleansedRichTextField(_("footnote text"))
+        richtext = TranslatableCleansedRichTextField(_("footnote text"), null=True, blank=True)
     else:
-        richtext = CleansedRichTextField(_("footnote text"))
+        richtext = CleansedRichTextField(_("footnote text"), null=True, blank=True)
 
     html_tag = '<li>'
 
