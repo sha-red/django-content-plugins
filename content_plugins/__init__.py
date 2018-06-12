@@ -1,14 +1,14 @@
 from django.conf import settings
 
-__version__ = '0.2.0'
 
 try:
     from ._version import __version__
 except ImportError:
-    pass
+    __version__ = '0.0.0'
 
-VERSION = __version__.split('+')
-VERSION = tuple(list(map(int, VERSION[0].split('.'))) + VERSION[1:])
+VERSION = __version__.partition('+')
+VERSION = tuple(list(map(int, VERSION[0].split('.'))) + [VERSION[2]])
+
 
 USE_TRANSLATABLE_FIELDS = (
     getattr(settings, 'CONTENT_PLUGINS_USE_TRANSLATABLE_FIELDS', False) or
