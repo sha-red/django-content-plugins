@@ -7,10 +7,19 @@ import re
 import subprocess
 
 
+"""
+Use `git tag 1.0.0` to tag a release; `python setup.py --version`
+to update the  _version.py file.
+"""
+
+
 def get_version(prefix):
     if os.path.exists('.git'):
         parts = subprocess.check_output(['git', 'describe', '--tags']).decode().strip().split('-')
-        version = '{}.{}+{}'.format(*parts)
+        if len(parts) == 3:
+            version = '{}.{}+{}'.format(*parts)
+        else:
+            version = parts[0]
         version_py = "__version__ = '{}'".format(version)
         _version = os.path.join(prefix, '_version.py')
         if not os.path.exists(_version) or open(_version).read().strip() != version_py:
