@@ -29,6 +29,16 @@ class ContentPluginRenderer(TemplatePluginRenderer):
     def regions(self, item, inherit_from=None, regions=MultilingualRegions):
         return super().regions(item, inherit_from=inherit_from, regions=regions)
 
+    def admin_inlines(self, exclude=[]):
+        """
+        from . import content_plugins
+
+        class YourAdmin(admin.ModelAdmin):
+            inlines = content_plugins.renderer.admin_inlines()
+        """
+        plugins = [p for p in self.plugins() if p not in exclude]
+        return [p.admin_inline() for p in plugins]
+
 
 # Experimental implementation
 class PluginRenderer(content_editor.PluginRenderer):
