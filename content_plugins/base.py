@@ -1,4 +1,5 @@
 import re
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.template import Template
 from django.utils.html import mark_safe
@@ -96,8 +97,8 @@ class StringRendererPlugin(BasePlugin):
 
 
 class FilesystemTemplateRendererPlugin(BasePlugin):
-    template_name = None
     template_name_prefix = 'plugins/'
+    template_name = None
 
     class Meta:
         abstract = True
@@ -115,20 +116,14 @@ class FilesystemTemplateRendererPlugin(BasePlugin):
         then super's template names,
         finally prefixed _default.html.
         """
-        if getattr(self, 'template_name', False):
-            template_names = [
-                self.template_name,
-                self.prefixed_path(self.template_name)
-            ]
+        if self.template_name is None:
+            raise ImproperlyConfigured(
+                "FilesystemTemplateRendererPlugin requires either a definition of "
+                "'template_name' or an implementation of 'get_template_names()'")
         else:
-            template_names = []
-
-        # TODO Don't call super here, this *is* the file system template plugin
-        template_names.extend(super().get_template_names() or [])
-
-        return template_names + [
-            self.prefixed_path("_default.html")
-        ]
+            return [
+                self.prefixed_path(self.template_name),
+            ]
 
 
 class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
@@ -137,10 +132,8 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
     else:
         richtext = CleansedRichTextField(_("text"), blank=True)
 
-    template_name_prefix = \
-        FilesystemTemplateRendererPlugin.template_name_prefix + 'richtext/'
-
     admin_inline_baseclass = RichTextInlineBase
+    template_name = '_richtext.html'
 
     class Meta:
         abstract = True
