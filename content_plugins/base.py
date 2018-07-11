@@ -2,7 +2,8 @@ import re
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.template import Template
-from django.utils.html import mark_safe
+from django.utils.html import mark_safe, strip_tags
+from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
 
 from feincms3.cleanse import CleansedRichTextField
@@ -140,6 +141,9 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
         verbose_name = _("text")
         verbose_name_plural = _("texts")
 
+    def __str__(self):
+        return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
+
 
 class SectionBase(StyleMixin, BasePlugin):
     if USE_TRANSLATABLE_FIELDS:
@@ -152,6 +156,9 @@ class SectionBase(StyleMixin, BasePlugin):
         abstract = True
         verbose_name = _("section")
         verbose_name_plural = _("section")
+
+    def __str__(self):
+        return Truncator(strip_tags(self.subheading)).words(10, truncate=" ...")
 
     def get_template(self):
         return Template("""
@@ -204,6 +211,9 @@ class DownloadBase(StyleMixin, BasePlugin):
         verbose_name = _("download")
         verbose_name_plural = _("downloads")
 
+    def __str__(self):
+        return getattr(self.file, 'name', "")
+
     def render(self):
         template = """
         <a href="{url}">{name}</a>
@@ -228,6 +238,12 @@ class FootnoteBase(BasePlugin):
         abstract = True
         verbose_name = _("footnote")
         verbose_name_plural = _("footnote")
+
+    def __str__(self):
+        return "[{}] {}".format(
+            self.index,
+            Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
+        )
 
     # TODO Convert to Template
     def render(self, html_tag=None):
