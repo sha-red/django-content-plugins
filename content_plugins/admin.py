@@ -12,6 +12,12 @@ from content_editor.admin import ContentEditorInline
 class ContentInlineBase(ContentEditorInline):
     """
     Empty definition for later use.
+
+    Subclass who override the fields attribute must includes
+    the 'region' and 'ordering' fields:
+
+    class AdminInline(ContentInlineBase):
+        fields = ['region', 'ordering', ... more fields ...]
     """
 
 
