@@ -145,12 +145,14 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
 
 
-class SectionBase(StyleMixin, BasePlugin):
+class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     else:
         subheading = models.CharField(_("subheading"), null=True, blank=True, max_length=500)
     slug = AutoSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
+
+    template_name = '_sectionbreak.html'
 
     class Meta:
         abstract = True
@@ -159,14 +161,6 @@ class SectionBase(StyleMixin, BasePlugin):
 
     def __str__(self):
         return Truncator(strip_tags(self.subheading)).words(10, truncate=" ...")
-
-    def get_template(self):
-        return Template("""
-        </section>
-
-        <section id="{{ slug }}">
-            <h2>{{ subheading }}</h2>
-        """)
 
     def get_plugin_context(self, context=None, **kwargs):
         context = super().get_plugin_context(context=None, **kwargs)
