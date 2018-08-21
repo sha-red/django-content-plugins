@@ -1,2 +1,7 @@
+Next
+- New plugin class hierarchy:
+  BasePlugin->StringRendererPlugin,
+  BasePlugin->TemplateRendererPlugin->FilesystemTemplateRendererPlugin
+
 0.3.2 2018-08-20
-Made SectionBase plugin filesystem based.
+- made SectionBase plugin filesystem based.

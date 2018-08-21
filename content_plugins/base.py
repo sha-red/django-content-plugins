@@ -21,15 +21,7 @@ if USE_TRANSLATABLE_FIELDS:
     from .fields import TranslatableCleansedRichTextField
 
 
-"""
-TODO Class hierarchy should be
-    BasePlugin
-        StringRendererPlugin
-        TemplateRendererPlugin
-            FilesystemRendererPlugin (is specific for RomArchive)
-"""
-
-
+# TODO Rename to PluginBase
 class BasePlugin(models.Model):
     admin_inline_baseclass = ContentInlineBase
 
@@ -48,6 +40,34 @@ class BasePlugin(models.Model):
             model = cls
             regions = cls.regions
         return Inline
+
+    def get_plugin_context(self, context=None, **kwargs):
+        """
+        Returns a dict.
+        """
+        plugin_context = {}
+        plugin_context['content'] = self
+        plugin_context['parent'] = self.parent
+        if 'request_context' in kwargs:
+            plugin_context['request'] = getattr(kwargs['request_context'], 'request', None)
+        return plugin_context
+
+
+class StringRendererPlugin(BasePlugin):
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def register_with_renderer(cls, renderer):
+        renderer.register_string_renderer(cls, cls.render)
+
+    def render(self):
+        raise NotImplementedError("render method must be implemented by subclass")
+
+
+class TemplateRendererPlugin(BasePlugin):
+    class Meta:
+        abstract = True
 
     @classmethod
     def register_with_renderer(cls, renderer):
@@ -71,33 +91,10 @@ class BasePlugin(models.Model):
         """
         return self.get_template_names()
 
-    def get_plugin_context(self, context=None, **kwargs):
-        """
-        Returns a dict.
-        """
-        plugin_context = {}
-        plugin_context['content'] = self
-        plugin_context['parent'] = self.parent
-        if 'request_context' in kwargs:
-            plugin_context['request'] = getattr(kwargs['request_context'], 'request', None)
-        return plugin_context
-
     # For rendering the template's render() method is used
 
 
-class StringRendererPlugin(BasePlugin):
-    class Meta:
-        abstract = True
-
-    @classmethod
-    def register_with_renderer(cls, renderer):
-        renderer.register_template_renderer(cls, None, cls.render)
-
-    def render(self):
-        raise NotImplementedError
-
-
-class FilesystemTemplateRendererPlugin(BasePlugin):
+class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
     template_name_prefix = 'plugins/'
     template_name = None
 
@@ -145,6 +142,7 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
 
 
+# TODO Rename to SectionBreakBase
 class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
@@ -197,7 +195,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
 
 # TODO See comments on ImageBase; remove DownloadBase
-class DownloadBase(StyleMixin, BasePlugin):
+class DownloadBase(StyleMixin, StringRendererPlugin):
     file = models.FileField(upload_to='downloads/%Y/%m/')
 
     class Meta:
@@ -218,7 +216,7 @@ class DownloadBase(StyleMixin, BasePlugin):
         ))
 
 
-class FootnoteBase(BasePlugin):
+class FootnoteBase(StringRendererPlugin):
     # TODO Validators: index might only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
     if USE_TRANSLATABLE_FIELDS:
