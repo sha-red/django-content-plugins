@@ -95,7 +95,7 @@ class TemplateRendererPlugin(BasePlugin):
 
 
 class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
-    template_name_prefix = 'plugins/'
+    # template_name_prefix
     template_name = None
 
     class Meta:

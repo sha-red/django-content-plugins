@@ -1,7 +1,9 @@
 Next
+- No default template_name_prefix for FilesystemTemplateRendererPlugin
 - New plugin class hierarchy:
   BasePlugin->StringRendererPlugin,
   BasePlugin->TemplateRendererPlugin->FilesystemTemplateRendererPlugin
+- Bug fixes
 
 0.3.2 2018-08-20
 - made SectionBase plugin filesystem based.
