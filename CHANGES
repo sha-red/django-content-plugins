@@ -1,4 +1,4 @@
-Next
+0.3.3 2018-08-23
 - No default template_name_prefix for FilesystemTemplateRendererPlugin
 - New plugin class hierarchy:
   BasePlugin->StringRendererPlugin,
