@@ -51,7 +51,7 @@ class StyleMixin(models.Model):
         for t in template_names:
             name, ext = os.path.splitext(t)
             extended_template_names += [
-                "{name}/_{style}.{ext}".format(
+                "{name}/_{style}{ext}".format(
                     name=name, style=self.style, ext=ext),
                 t
             ]
