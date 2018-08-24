@@ -1,3 +1,6 @@
+0.3.5 2018-08-24
+- FootnoteBase as FilesystemTemplateRendererPlugin.
+
 0.3.4 2018-08-24
 - prepared_richtext, get_prepared_richtext API.
 

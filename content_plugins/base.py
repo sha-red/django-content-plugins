@@ -1,7 +1,7 @@
 import re
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.template import Template
 from django.utils.html import mark_safe, strip_tags
 from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
@@ -124,14 +124,23 @@ class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
             ]
 
 
-class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
+class PrepareRichtextMixin:
+    @property
+    def prepared_richtext(self):
+        return mark_safe(self.get_prepared_richtext(self.richtext))
+
+    def get_prepared_richtext(self, richtext):
+        return richtext
+
+
+class RichTextBase(PrepareRichtextMixin, StyleMixin, FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
     else:
         richtext = CleansedRichTextField(_("text"), blank=True)
 
     admin_inline_baseclass = RichTextInlineBase
-    template_name = '_richtext.html'
+    template_name = 'plugins/_richtext.html'
 
     class Meta:
         abstract = True
@@ -140,13 +149,6 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
     def __str__(self):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
-
-    @property
-    def prepared_richtext(self):
-        return mark_safe(self.get_prepared_richtext(self.richtext))
-
-    def get_prepared_richtext(self, richtext):
-        return richtext
 
 
 # TODO Rename to SectionBreakBase
@@ -167,6 +169,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
     def __str__(self):
         return Truncator(strip_tags(self.subheading)).words(10, truncate=" ...")
 
+    # FIXME Not need, members are accessible through {{ content.slug }} etc.
     def get_plugin_context(self, context=None, **kwargs):
         context = super().get_plugin_context(context=None, **kwargs)
         context['slug'] = self.slug
@@ -223,7 +226,7 @@ class DownloadBase(StyleMixin, StringRendererPlugin):
         ))
 
 
-class FootnoteBase(StringRendererPlugin):
+class FootnoteBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
     # TODO Validators: index might only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
     if USE_TRANSLATABLE_FIELDS:
@@ -231,7 +234,9 @@ class FootnoteBase(StringRendererPlugin):
     else:
         richtext = CleansedRichTextField(_("footnote text"), null=True, blank=True)
 
-    html_tag = '<li>'
+    html_tag = getattr(settings, 'FOOTNOTE_TAG', 'div')
+
+    template_name = 'plugins/_footnote.html'
 
     class Meta:
         abstract = True
@@ -244,28 +249,7 @@ class FootnoteBase(StringRendererPlugin):
             Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
         )
 
-    # TODO Convert to Template
-    def render(self, html_tag=None):
-        template = """
-        {opening_tag}
-            <a id="fn{number}" class="footnote-index" href="#back{number}">{number}</a>
-            <div class="text">{text}</div>
-        {closing_tag}
-        """
-        context = {
-            'number': self.index,
-            'text': mark_safe(self.richtext or ""),
-            'opening_tag': "",
-            'closing_tag': "",
-        }
-        html_tag = html_tag or self.html_tag
-        if html_tag:
-            context['opening_tag'] = html_tag
-            context['closing_tag'] = '{0}/{1}'.format(html_tag[:1], html_tag[1:])
-        return mark_safe(template.format(**context))
 
-
-# FIXME Currently doesn't do anything
 class RichTextFootnoteMixin:
     MATCH_FOOTNOTES = re.compile("<sup>(\w+)</sup>")
 
