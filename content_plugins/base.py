@@ -141,6 +141,13 @@ class RichTextBase(StyleMixin, FilesystemTemplateRendererPlugin):
     def __str__(self):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
 
+    @property
+    def prepared_richtext(self):
+        return mark_safe(self.get_prepared_richtext(self.richtext))
+
+    def get_prepared_richtext(self, richtext):
+        return richtext
+
 
 # TODO Rename to SectionBreakBase
 class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
@@ -262,9 +269,10 @@ class FootnoteBase(StringRendererPlugin):
 class RichTextFootnoteMixin:
     MATCH_FOOTNOTES = re.compile("<sup>(\w+)</sup>")
 
-    def render(self):
+    def get_prepared_richtext(self, richtext):
         # Find all footnotes and convert them into links
+        richtext = super().get_prepared_richtext(richtext)
         rv = self.MATCH_FOOTNOTES.subn(
             '<sup id=\"back\g<1>\" class="footnote"><a href=\"#fn\g<1>\">\g<1></a></sup>',
-            self.richtext)[0]
-        return mark_safe(rv)
+            richtext)[0]
+        return rv
