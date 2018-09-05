@@ -7,16 +7,9 @@ from content_editor.contents import contents_for_item
 from shared.utils.text import html_entities_to_unicode
 
 
-def render_page_as_text(page, renderer, template, language):
+def render_page_as_text(page, template, context_data):
     request = HttpRequest()
     request.user = AnonymousUser()
-    contents = contents_for_item(page, renderer.plugins())
-    context = {
-        'contents': contents,
-        'language': language,
-        'page': page,
-        'renderer': renderer,
-    }
-    html = render_to_string(template, context, request=request)
+    html = render_to_string(template, context_data, request=request)
     text = html_entities_to_unicode(strip_tags(html)).strip()
     return text
