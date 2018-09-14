@@ -7,7 +7,7 @@ from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
 
 from feincms3.cleanse import CleansedRichTextField
-from shared.utils.fields import AutoSlugField
+from shared.utils.models.slugs import DowngradingSlugField
 
 # TODO Rename ContentInlineBase to PluginInlineBase
 from .admin import ContentInlineBase, RichTextInlineBase
@@ -157,7 +157,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
         subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     else:
         subheading = models.CharField(_("subheading"), null=True, blank=True, max_length=500)
-    slug = AutoSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
+    slug = DowngradingSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
 
     template_name = '_sectionbreak.html'
 
