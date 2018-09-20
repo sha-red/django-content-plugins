@@ -3,6 +3,8 @@ import os
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from shared.utils.text import slugify
+
 
 class StyleField(models.CharField):
     """
@@ -23,7 +25,8 @@ class StyleMixin(models.Model):
         abstract = True
 
     def get_style_slug(self):
-        return getattr(self, 'style', None) or 'default'
+        style = getattr(self, 'style', None) or 'default'
+        return slugify(style).replace("_", "-")
 
     # # Compatibiliy with super classes not having a prefixed_path method
     # def prefixed_path(self, path):
