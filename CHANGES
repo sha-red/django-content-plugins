@@ -1,3 +1,7 @@
+0.3.10 2018-09-24
+- add render_as_html shortcut
+- render_as_text can take css selector (requires lxml)
+
 0.3.9 2018-09-20
 - Slugify style slug in StyleMixin
 
