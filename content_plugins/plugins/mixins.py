@@ -28,6 +28,7 @@ class StyleMixin(models.Model):
         style = getattr(self, 'style', None) or 'default'
         return slugify(style).replace("_", "-")
 
+    # TODO Remove stale code
     # # Compatibiliy with super classes not having a prefixed_path method
     # def prefixed_path(self, path):
     #     if hasattr(super(), 'prefixed_path'):

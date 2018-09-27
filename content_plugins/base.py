@@ -171,7 +171,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
     # FIXME Not need, members are accessible through {{ content.slug }} etc.
     def get_plugin_context(self, context=None, **kwargs):
-        context = super().get_plugin_context(context=None, **kwargs)
+        context = super().get_plugin_context(context=context, **kwargs)
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context
