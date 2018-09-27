@@ -1,3 +1,6 @@
+0.3.11 2018-09-27
+- RichTextBase has no longer StyleMixin as default.
+
 0.3.10 2018-09-24
 - add render_as_html shortcut
 - render_as_text can take css selector (requires lxml)
