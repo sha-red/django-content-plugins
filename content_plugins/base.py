@@ -133,7 +133,7 @@ class PrepareRichtextMixin:
         return richtext
 
 
-class RichTextBase(PrepareRichtextMixin, StyleMixin, FilesystemTemplateRendererPlugin):
+class RichTextBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
     else:
