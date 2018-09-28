@@ -16,6 +16,8 @@ def render_page_as_html(page, template, context_data, css_selector=None):
     if css_selector:
         import lxml.html
         doc = lxml.html.fromstring(html)
+        for element in doc.cssselect('script,style'):
+            element.getparent().remove(element)
         html = []
         for part in doc.cssselect(css_selector):
             html.append(lxml.html.tostring(part).decode().strip())
