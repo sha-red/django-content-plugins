@@ -21,7 +21,6 @@ if USE_TRANSLATABLE_FIELDS:
     from .fields import TranslatableCleansedRichTextField
 
 
-# TODO Rename to PluginBase
 class BasePlugin(models.Model):
     admin_inline_baseclass = ContentInlineBase
 
@@ -29,6 +28,10 @@ class BasePlugin(models.Model):
         abstract = True
         verbose_name = _("plugin")
         verbose_name_plural = _("plugins")
+
+    @classmethod
+    def register_with_renderer(cls, renderer):
+        pass
 
     def __str__(self):
         return "{} ({})".format(self._meta.verbose_name, self.pk)
