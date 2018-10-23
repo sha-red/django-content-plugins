@@ -254,11 +254,13 @@ class FootnoteBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
 
 
 class RichTextFootnoteMixin:
+    OO_FOOTNOTES = re.compile("<a.*?>(<sup>(.*?)</sup>)</a>")
     MATCH_FOOTNOTES = re.compile("<sup>(\w+)</sup>")
 
     def get_prepared_richtext(self, richtext):
         # Find all footnotes and convert them into links
         richtext = super().get_prepared_richtext(richtext)
+        richtext = self.OO_FOOTNOTES.subn('\g<1>', richtext)[0]
         rv = self.MATCH_FOOTNOTES.subn(
             '<sup id=\"back\g<1>\" class="footnote"><a href=\"#fn\g<1>\">\g<1></a></sup>',
             richtext)[0]
