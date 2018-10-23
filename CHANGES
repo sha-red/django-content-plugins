@@ -1,3 +1,6 @@
+0.3.12 2018-10-23
+- RichTextFootnoteMixin cleans up LibreOffice footnote links
+
 0.3.11 2018-09-27
 - RichTextBase has no longer StyleMixin as default.
 
