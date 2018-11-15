@@ -1,3 +1,8 @@
+0.3.13 2018-11-15
+- Helping template tags.
+- Footnote text as span (inline).
+- Some feincms3 helper tags.
+
 0.3.12 2018-10-23
 - RichTextFootnoteMixin cleans up LibreOffice footnote links
 
