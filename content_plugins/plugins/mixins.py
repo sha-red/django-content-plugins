@@ -28,14 +28,6 @@ class StyleMixin(models.Model):
         style = getattr(self, 'style', None) or 'default'
         return slugify(style).replace("_", "-")
 
-    # TODO Remove stale code
-    # # Compatibiliy with super classes not having a prefixed_path method
-    # def prefixed_path(self, path):
-    #     if hasattr(super(), 'prefixed_path'):
-    #         return super().prefixed_path(path)
-    #     else:
-    #         return path
-
     def add_styled_template_names(self, template_names):
         """
         if super().get_template_names():
@@ -59,7 +51,6 @@ class StyleMixin(models.Model):
                     name=name, style=self.style, ext=ext),
                 template
             ]
-
         return extended_template_names
 
     def get_template_names(self):
