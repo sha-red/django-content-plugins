@@ -30,4 +30,8 @@ def render_page_as_text(page, template, context_data, css_selector=None):
     text = re.sub('[\t ]+', ' ', text)
     text = re.sub(re.compile('\n +', re.DOTALL), '\n', text)
     text = re.sub(re.compile('\n+', re.DOTALL), '\n', text)
-    return text
+    content = []
+    for word in text.split(' '):
+        if len(word) <= 245:
+            content += [word]
+    return ' '.join(content)
