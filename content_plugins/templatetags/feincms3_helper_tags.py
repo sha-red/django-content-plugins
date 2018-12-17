@@ -29,17 +29,20 @@ def menus():
                 ~Q(menu=''),
                 *q_filters,
             ).extra(
-                where=['level BETWEEN {} AND {}'.format(depth_from, depth_to)],
+                where=['level BETWEEN %s AND %s'],
+                params=[depth_from, depth_to],
             )
         except FieldDoesNotExist:
+            # FeinCMS3 Model
             pages = model.objects.with_tree_fields().filter(
                 ~Q(menu=''),
                 *q_filters,
             ).extra(
-                where=['tree_depth BETWEEN {} AND {}'.format(depth_from, depth_to)],
+                where=['tree_depth BETWEEN %s AND %s'],
+                params=[depth_from, depth_to],
             )
-        for content in pages:
-            menus[content.menu].append(content)
+        for page in pages:
+            menus[page.menu].append(page)
 
     for k, v in MENUMIXIN_MODELS.items():
         add_menus_from_model(
