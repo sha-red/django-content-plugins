@@ -9,3 +9,6 @@ if USE_TRANSLATABLE_FIELDS:
     class TranslatableCleansedRichTextField(TranslatableFieldMixin, CleansedRichTextField):
         base_class = CleansedRichTextField
         extra_parameter_names = ['config_name', 'extra_plugins', 'external_plugin_resources']
+
+else:
+    TranslatableCleansedRichTextField = CleansedRichTextField
