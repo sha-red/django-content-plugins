@@ -98,7 +98,7 @@ class TemplateRendererPlugin(BasePlugin):
 
 
 class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
-    # template_name_prefix
+    template_name_prefix = None
     template_name = None
 
     class Meta:
@@ -108,6 +108,7 @@ class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
         return getattr(self, 'template_name_prefix', '')
 
     def prefixed_path(self, path):
+        # TODO Use posixpath
         return "{}{}".format(self.get_template_name_prefix(), path)
 
     def get_template_names(self):
@@ -162,7 +163,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
         subheading = models.CharField(_("subheading"), null=True, blank=True, max_length=500)
     slug = DowngradingSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
 
-    template_name = '_sectionbreak.html'
+    template_name = 'plugins/_sectionbreak.html'
 
     class Meta:
         abstract = True
@@ -230,7 +231,7 @@ class DownloadBase(StyleMixin, StringRendererPlugin):
 
 
 class FootnoteBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
-    # TODO Validators: index might only contain alphanumeric characters
+    # TODO Validators: index must only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
     if USE_TRANSLATABLE_FIELDS:
         richtext = TranslatableCleansedRichTextField(_("footnote text"), null=True, blank=True)
@@ -238,7 +239,6 @@ class FootnoteBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
         richtext = CleansedRichTextField(_("footnote text"), null=True, blank=True)
 
     html_tag = getattr(settings, 'FOOTNOTE_TAG', 'div')
-
     template_name = 'plugins/_footnote.html'
 
     class Meta:
