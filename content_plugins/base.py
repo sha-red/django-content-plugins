@@ -98,8 +98,8 @@ class TemplateRendererPlugin(BasePlugin):
 
 
 class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
-    template_name_prefix = None
-    template_name = None
+    template_name_prefix = ''
+    template_name = ''
 
     class Meta:
         abstract = True
@@ -118,7 +118,7 @@ class FilesystemTemplateRendererPlugin(TemplateRendererPlugin):
         then super's template names,
         finally prefixed _default.html.
         """
-        if self.template_name is None:
+        if not self.template_name:
             raise ImproperlyConfigured(
                 "FilesystemTemplateRendererPlugin requires either a definition of "
                 "'template_name' or an implementation of 'get_template_names()'")
