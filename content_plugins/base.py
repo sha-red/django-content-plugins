@@ -1,4 +1,6 @@
+import os
 import re
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -180,6 +182,65 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context
+
+
+class ObjectPluginBase(FilesystemTemplateRendererPlugin):
+    fk_fieldname = None
+    regions = None
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(getattr(self, self.fk_fieldname, ""))
+
+    @property
+    def object(self):
+        assert self.fk_fieldname, "fk_fieldname not set."
+        return getattr(self, self.fk_fieldname)
+
+    def get_type_slug(self):
+        type = getattr(self.object, 'type', None)
+        if type:
+            return getattr(type, 'internal_slug', "")
+        return ""
+
+    def get_template_names(self):
+        """"
+        _<fk_fieldname>_<object.type>/_<style>.html
+        _<fk_fieldname>_<object.type>.html
+        _<fk_fieldname>/_<style>.html
+        _<fk_fieldname>.html
+        """
+        assert self.fk_fieldname, "fk_fieldname not set."
+
+        template_names = []
+        type_slug = self.get_type_slug()
+
+        if getattr(self, 'template_name', False):
+            base_template_name = os.path.splitext(self.template_name)[0]
+        else:
+            base_template_name = "plugins/_{}".format(self.fk_fieldname)
+
+        if type_slug:
+            template_names.append(self.prefixed_path(
+                "{}_{}.html".format(
+                    base_template_name, type_slug
+                )
+            ))
+        template_names.append(
+            self.prefixed_path("{}.html".format(base_template_name)))
+        return template_names
+
+    @classmethod
+    def admin_inline(cls):
+        assert cls.fk_fieldname, "fk_fieldname not set."
+
+        inline = super().admin_inline()
+        if not inline.raw_id_fields:
+            inline.raw_id_fields = []
+        inline.raw_id_fields += [cls.fk_fieldname]
+        return inline
 
 
 # ImageBase can't live here because image managment is different from project to project
