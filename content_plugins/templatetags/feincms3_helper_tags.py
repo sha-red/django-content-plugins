@@ -12,11 +12,23 @@ from django.db.models import Q
 register = template.Library()
 
 
+"""
+settings.py:
+
+MENUMIXIN_MODELS = {
+    # class: [depth_from, depth_to, q_filters]
+    'projects.Project': [1, 1, None],
+    'site_pages.SitePage': [0, 1, (~Q(slug='frontpage'), Q(is_active=True))],
+}
+"""
+
 MENUMIXIN_MODELS = getattr(settings, 'MENUMIXIN_MODELS', {})
 
 
 @register.simple_tag
 def menus():
+    # FIXME page.cte_path and page.path
+
     menus = defaultdict(list)
 
     def add_menus_from_model(model, depth_from=1, depth_to=1, q_filters=None):

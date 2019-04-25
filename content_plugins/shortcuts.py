@@ -4,13 +4,13 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from content_editor.contents import contents_for_item
 from shared.utils.text import html_entities_to_unicode
 
 
 def render_page_as_html(page, template, context_data, css_selector=None):
     request = HttpRequest()
     request.user = AnonymousUser()
+    assert template, "No template supplied"
     html = render_to_string(template, context_data, request=request)
 
     if css_selector:
@@ -23,6 +23,7 @@ def render_page_as_html(page, template, context_data, css_selector=None):
             html.append(lxml.html.tostring(part).decode().strip())
         html = '\n'.join(html)
     return html
+
 
 def render_page_as_text(page, template, context_data, css_selector=None):
     html = render_page_as_html(page, template, context_data, css_selector)
