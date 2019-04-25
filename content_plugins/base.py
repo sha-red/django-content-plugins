@@ -158,8 +158,7 @@ class RichTextBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
 
 
-# TODO Rename to SectionBreakBase
-class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
+class SectionBreakBase(StyleMixin, FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     else:
@@ -184,7 +183,7 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
         return context
 
 
-SectionBreakBase = SectionBase
+SectionBase = SectionBreakBase
 
 
 class ObjectPluginBase(FilesystemTemplateRendererPlugin):
