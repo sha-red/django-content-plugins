@@ -243,35 +243,38 @@ class ObjectPluginBase(FilesystemTemplateRendererPlugin):
         return inline
 
 
-# ImageBase can't live here because image managment is different from project to project
-# class ImageBase(StyleMixin, BasePlugin):
-#     image = models.ForeignKey(Image, on_delete=models.PROTECT)
-#     alt_caption = TranslatableCharField(_("caption"), max_length=500, null=True, blank=True, help_text=_("Optional, used instead of the caption of the image object."))#
+class SimpleImageBase(StringRendererPlugin):
+    image = models.ImageField(_("image"), upload_to='images/%Y/%m/')
+    caption = TranslatableCharField(_("caption"), max_length=500,
+        null=True, blank=True,
+        help_text=_("Optional, used instead of the caption of the image object."))
 
-#     class Meta:
-#         abstract = True
-#         verbose_name = _("image")
-#         verbose_name_plural = _("images")#
+    class Meta:
+        abstract = True
+        verbose_name = _("image")
+        verbose_name_plural = _("images")
 
-#     def render(self):
-#         template = """
-#         <figure class="image">
-#             <img src="{src}">#
+    def __str__(self):
+        return getattr(self.image, 'name', "")
 
-#             <figcaption>
-#                 {caption_text}
-#             </figcaption>
-#         </figure>
-#         """
-#         # TOOD Assemble caption from image's captions if empty
-#         return mark_safe(template.format(
-#             src=self.image.figure_image.url,
-#             caption_text=mark_safe(self.alt_caption or "")
-#         ))
+    def render(self):
+        template = """
+        <figure class="image">
+            <img src="{src}">
+
+            <figcaption>
+                {caption_text}
+            </figcaption>
+        </figure>
+        """
+
+        return mark_safe(template.format(
+            src=self.image.url,
+            caption_text=mark_safe(self.caption or "")
+        ))
 
 
-# TODO See comments on ImageBase; remove DownloadBase
-class DownloadBase(StyleMixin, StringRendererPlugin):
+class SimpleDownloadBase(StringRendererPlugin):
     file = models.FileField(upload_to='downloads/%Y/%m/')
 
     class Meta:
@@ -284,7 +287,7 @@ class DownloadBase(StyleMixin, StringRendererPlugin):
 
     def render(self):
         template = """
-        <a href="{url}">{name}</a>
+        <a href="{url}" download="{name}">{name}</a>
         """
         return mark_safe(template.format(
             url=self.file.url,

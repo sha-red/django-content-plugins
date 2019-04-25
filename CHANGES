@@ -1,3 +1,5 @@
+- Added SimpleImagePlugin and SimpleDownloadPlugin.
+
 0.3.19 2019-04-02
 - Again better template_name handling.
 - Added ObjectPluginBase class.
