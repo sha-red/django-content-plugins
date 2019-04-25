@@ -170,8 +170,8 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
 
     class Meta:
         abstract = True
-        verbose_name = _("section")
-        verbose_name_plural = _("section")
+        verbose_name = _("section break")
+        verbose_name_plural = _("section break")
 
     def __str__(self):
         return Truncator(strip_tags(self.subheading)).words(10, truncate=" ...")
@@ -182,6 +182,9 @@ class SectionBase(StyleMixin, FilesystemTemplateRendererPlugin):
         context['slug'] = self.slug
         context['subheading'] = self.subheading
         return context
+
+
+SectionBreakBase = SectionBase
 
 
 class ObjectPluginBase(FilesystemTemplateRendererPlugin):
