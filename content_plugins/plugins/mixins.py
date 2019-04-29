@@ -24,6 +24,20 @@ class StyleMixin(models.Model):
     class Meta:
         abstract = True
 
+    class AdminMixin:
+        def get_fields(self, request, obj=None):
+            fields = super().get_fields(request, obj)
+            if 'style' not in fields:
+                fields.append('style')
+            return fields
+
+    @classmethod
+    def admin_inline(cls):
+        class MixedClass(super().admin_inline(), cls.AdminMixin):
+            pass
+
+        return MixedClass
+
     def get_style_slug(self):
         style = getattr(self, 'style', None) or 'default'
         return slugify(style).replace("_", "-")

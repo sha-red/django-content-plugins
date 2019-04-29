@@ -1,4 +1,8 @@
+0.4 2019-04-29
+- Slightly refactored AdminInline construction and plugin mixins.
+- Added django-media-archive plugins, ImageBase and DownloadBase.
 - Added SimpleImagePlugin and SimpleDownloadPlugin.
+- Renamed 'SectionBase' to 'SectionBreakBase'.
 
 0.3.19 2019-04-02
 - Again better template_name handling.

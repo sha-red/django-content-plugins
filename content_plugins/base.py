@@ -40,7 +40,6 @@ class BasePlugin(models.Model):
 
     @classmethod
     def admin_inline(cls, base_class=None):
-        # TODO Cache inline
         class Inline(base_class or cls.admin_inline_baseclass):
             model = cls
             regions = cls.regions
@@ -158,7 +157,7 @@ class RichTextBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
         return Truncator(strip_tags(self.richtext)).words(10, truncate=" ...")
 
 
-class SectionBreakBase(StyleMixin, FilesystemTemplateRendererPlugin):
+class SectionBreakBase(FilesystemTemplateRendererPlugin):
     if USE_TRANSLATABLE_FIELDS:
         subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     else:
