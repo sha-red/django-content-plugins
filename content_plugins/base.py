@@ -13,8 +13,8 @@ from shared.utils.models.slugs import DowngradingSlugField
 
 # TODO Rename ContentInlineBase to PluginInlineBase
 from .admin import ContentInlineBase, RichTextInlineBase
+from .plugins.mixins import StyleMixin  # Make available for import
 
-from .plugins.mixins import StyleMixin
 from . import USE_TRANSLATABLE_FIELDS
 
 

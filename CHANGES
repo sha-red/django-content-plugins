@@ -1,3 +1,6 @@
+0.4.1 2019-04-30
+- Default plugin templates.
+
 0.4 2019-04-29
 - Slightly refactored AdminInline construction and plugin mixins.
 - Added django-media-archive plugins, ImageBase and DownloadBase.
