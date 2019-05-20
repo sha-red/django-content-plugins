@@ -55,21 +55,11 @@ class ImageBase(ObjectPluginBase):
         return ''
 
     class AdminInline(ContentInlineBase):
-        fields = ContentInlineBase.fields or []
         if USE_ADMIN_THUMBNAIL:
-            fields = fields + ['admin_thumbnail']
             admin_thumbnail = AdminThumbnail(
                 image_field=image_thumbnail,
                 template='imagekit/admin/selectable_thumbnail.html')
             admin_thumbnail.short_description = _("image")
-        fields = fields + [
-            'image',
-            'get_is_public_display',
-        ]
-        readonly_fields = ContentInlineBase.fields or [] + [
-            'admin_thumbnail',
-            'get_is_public_display',
-        ]
 
         def get_is_public_display(self, obj):
             if not obj.image.is_public:
@@ -77,6 +67,13 @@ class ImageBase(ObjectPluginBase):
             else:
                 return _("published")
         get_is_public_display.short_description = _("published")
+
+        def get_readonly_fields(self, request, obj=None):
+            readonly_fields = list(super().get_readonly_fields(request, obj))
+            if USE_ADMIN_THUMBNAIL:
+                readonly_fields += ['admin_thumbnail']
+            readonly_fields += ['get_is_public_display']
+            return readonly_fields
 
     admin_inline_baseclass = AdminInline
 
@@ -96,19 +93,16 @@ class DownloadBase(ObjectPluginBase):
         return ''
 
     class AdminInline(ContentInlineBase):
-        fields = ContentInlineBase.fields or [] + [
-            'download',
-            'get_is_public_display',
-        ]
-        readonly_fields = ContentInlineBase.readonly_fields or [] + [
-            'get_is_public_display',
-        ]
-
         def get_is_public_display(self, obj):
             if not obj.download.is_public:
                 return _("not published/visible")
             else:
                 return _("published")
         get_is_public_display.short_description = _("published")
+
+        def get_readonly_fields(self, request, obj=None):
+            readonly_fields = list(super().get_readonly_fields(request, obj))
+            readonly_fields += ['get_is_public_display']
+            return readonly_fields
 
     admin_inline_baseclass = AdminInline
