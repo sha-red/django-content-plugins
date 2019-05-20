@@ -1,3 +1,9 @@
+0.4.3 2019-05-20
+- Fix: allow to run without ckeditor_uploader installed.
+
+0.4.2 2019-05-20
+- Fixed media archive admin inlines.
+
 0.4.1 2019-04-30
 - Default plugin templates.
 
