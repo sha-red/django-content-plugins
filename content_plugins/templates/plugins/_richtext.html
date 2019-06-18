@@ -1,5 +1,9 @@
 {% extends "plugins/_base.html" %}
 
+
+{% block plugin_class %}{{ block.super }} {{ content.style|default:"" }}{% endblock plugin_class %}
+
+
 {% block plugin_content %}
 	{{ content.prepared_richtext }}
 {% endblock plugin_content %}
