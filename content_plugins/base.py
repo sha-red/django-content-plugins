@@ -8,7 +8,6 @@ from django.utils.html import mark_safe, strip_tags
 from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
 
-from feincms3.cleanse import CleansedRichTextField
 from shared.utils.models.slugs import DowngradingSlugField
 
 # TODO Rename ContentInlineBase to PluginInlineBase
@@ -21,6 +20,10 @@ from . import USE_TRANSLATABLE_FIELDS
 if USE_TRANSLATABLE_FIELDS:
     from shared.multilingual.utils.fields import TranslatableCharField
     from .fields import TranslatableCleansedRichTextField
+else:
+    from feincms3.cleanse import CleansedRichTextField
+    TranslatableCharField = models.CharField
+    TranslatableCleansedRichTextField = CleansedRichTextField
 
 
 class BasePlugin(models.Model):
@@ -140,10 +143,7 @@ class PrepareRichtextMixin:
 
 
 class RichTextBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
-    if USE_TRANSLATABLE_FIELDS:
-        richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
-    else:
-        richtext = CleansedRichTextField(_("text"), blank=True)
+    richtext = TranslatableCleansedRichTextField(_("text"), blank=True)
 
     admin_inline_baseclass = RichTextInlineBase
     template_name = 'plugins/_richtext.html'
@@ -158,10 +158,7 @@ class RichTextBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
 
 
 class SectionBreakBase(FilesystemTemplateRendererPlugin):
-    if USE_TRANSLATABLE_FIELDS:
-        subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
-    else:
-        subheading = models.CharField(_("subheading"), null=True, blank=True, max_length=500)
+    subheading = TranslatableCharField(_("subheading"), null=True, blank=True, max_length=500)
     slug = DowngradingSlugField(_("slug"), max_length=200, blank=True, populate_from='subheading', unique_slug=False)
 
     template_name = 'plugins/_sectionbreak.html'
@@ -299,10 +296,7 @@ class SimpleDownloadBase(StringRendererPlugin):
 class FootnoteBase(PrepareRichtextMixin, FilesystemTemplateRendererPlugin):
     # TODO Validators: index must only contain alphanumeric characters
     index = models.CharField(_("footnote index"), max_length=10)
-    if USE_TRANSLATABLE_FIELDS:
-        richtext = TranslatableCleansedRichTextField(_("footnote text"), null=True, blank=True)
-    else:
-        richtext = CleansedRichTextField(_("footnote text"), null=True, blank=True)
+    richtext = TranslatableCleansedRichTextField(_("footnote text"), null=True, blank=True)
 
     html_tag = getattr(settings, 'FOOTNOTE_TAG', 'div')
     template_name = 'plugins/_footnote.html'
