@@ -1,3 +1,7 @@
+0.4.4 2019-06-18
+- Optimized code for handling of optional translated fields.
+- HTML: Style class for richtext plugin.
+
 0.4.3 2019-05-20
 - Fix: allow to run without ckeditor_uploader installed.
 
