@@ -1,3 +1,6 @@
+0.4.5 2019-07-14
+- Removed whitespace from section break plugin.
+
 0.4.4 2019-06-18
 - Optimized code for handling of optional translated fields.
 - HTML: Style class for richtext plugin.
