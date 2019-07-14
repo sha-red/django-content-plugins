@@ -171,7 +171,7 @@ class SectionBreakBase(FilesystemTemplateRendererPlugin):
     def __str__(self):
         return Truncator(strip_tags(self.subheading)).words(10, truncate=" ...")
 
-    # FIXME Not need, members are accessible through {{ content.slug }} etc.
+    # FIXME Not needed, members are accessible through {{ content.slug }} etc.
     def get_plugin_context(self, context=None, **kwargs):
         context = super().get_plugin_context(context=context, **kwargs)
         context['slug'] = self.slug
